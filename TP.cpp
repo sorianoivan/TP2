@@ -17,6 +17,8 @@ int TP::run(const char *map, const char *trabajadores) {
     fillQueues();
     releaseTrabajadores();
 
+    inventario.showLeft();
+
     return 0;
 }
 
@@ -27,17 +29,17 @@ TP::~TP() {
 void TP::spawnTrabajadores() {
     file_processor.processTrabajadores();
     for (int i = 0; i < file_processor.getCantAgricultores(); ++i) {
-        agricultores.push_back(new Collector(agricultores_queue));
+        agricultores.push_back(new Collector(agricultores_queue, inventario));
         agricultores[i]->start();
     }
 
     for (int i = 0; i < file_processor.getCantLeniadores(); ++i) {
-        leniadores.push_back(new Collector(leniadores_queue));
+        leniadores.push_back(new Collector(leniadores_queue, inventario));
         leniadores[i]->start();
     }
 
     for (int i = 0; i < file_processor.getCantMineros(); ++i) {
-        mineros.push_back(new Collector(mineros_queue));
+        mineros.push_back(new Collector(mineros_queue, inventario));
         mineros[i]->start();
     }
 }
@@ -82,5 +84,5 @@ void TP::fillQueues() {
     }
     agricultores_queue.close();
     leniadores_queue.close();
-    mineros_queue.close();
+    mineros_queue.close(); //ver de poner las colas en un vector
 }

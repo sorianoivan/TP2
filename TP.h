@@ -8,11 +8,14 @@
 #include "BlockingQueue.h"
 #include "Recursos.h"
 #include "Collector.h"
+#include "Inventario.h"
 
 class TP {
 private:
     int flag;
     FileProcessor file_processor;
+
+    Inventario inventario;
 
     BlockingQueue agricultores_queue;
     BlockingQueue leniadores_queue;

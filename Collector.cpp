@@ -7,6 +7,10 @@ void Collector::work() {
     while (this->queue.canPop()) {
         this->recurso = this->queue.pop();
         usleep(50000);
-        std::cout << this->recurso;
+        //agregar recurso al inventario
+        if (this->recurso != NoRecurso){
+            //std::cout << this->recurso;
+            inventario.store(recurso);
+        }
     }
 }

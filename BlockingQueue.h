@@ -17,7 +17,7 @@ private:
 
 public:
     BlockingQueue() : done_pushing(false) {}
-    void push(const Recurso recurso);
+    void push(Recurso recurso);
     Recurso pop();
     bool canPop();
     void close();
