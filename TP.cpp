@@ -121,7 +121,7 @@ void TP::releaseProductores() {
 }
 
 void TP::mostrarResultados() const {
-    std::cout << "Recursos Restantes:" << std::endl;
+    std::cout << "Recursos restantes:" << std::endl;
     std::cout << "  - Trigo: " << inventario.getCantTrigo() << std::endl;
     std::cout << "  - Madera: " << inventario.getCantMadera() << std::endl;
     std::cout << "  - Carbon: " << inventario.getCantCarbon() << std::endl;
