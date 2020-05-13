@@ -9,7 +9,7 @@ TP::TP() {
     flag = 0;
 }
 
-int TP::run(std::string map, std::string trabajadores) {
+int TP::run(std::string trabajadores, std::string map) {
     try{
         file_processor.openFiles(std::move(map), std::move(trabajadores));
     } catch(int e) {flag = ERROR_FILE;}
@@ -121,7 +121,7 @@ void TP::releaseProductores() {
 }
 
 void TP::mostrarResultados() const {
-    std::cout << "Recursos restantes:" << std::endl;
+    std::cout << "Recursos Restantes:" << std::endl;
     std::cout << "  - Trigo: " << inventario.getCantTrigo() << std::endl;
     std::cout << "  - Madera: " << inventario.getCantMadera() << std::endl;
     std::cout << "  - Carbon: " << inventario.getCantCarbon() << std::endl;
