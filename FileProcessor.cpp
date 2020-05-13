@@ -1,5 +1,7 @@
 #include "FileProcessor.h"
 
+#include <string>
+
 #define ERROR_FILE -2
 
 FileProcessor::FileProcessor() {
@@ -12,8 +14,8 @@ FileProcessor::FileProcessor() {
     cant_armeros = 0;
 }
 
-void FileProcessor::openFiles(const char* map_filename,
-                                 const char* trabajadores_filename) {
+void FileProcessor::openFiles(std::string map_filename,
+                              std::string trabajadores_filename) {
     this->map.open(map_filename);
     if (!this->map.is_open()) throw ERROR_FILE;
 
@@ -42,11 +44,6 @@ void FileProcessor::processTrabajadores() {
     }
 }
 
-FileProcessor::~FileProcessor() {
-    this->map.close();
-    this->trabajadores.close();
-}
-
 int FileProcessor:: getCantAgricultores() const{
     return this->cant_agricultores;
 }
@@ -73,4 +70,9 @@ int FileProcessor:: getCantArmeros() const{
 
 bool FileProcessor::recursosDepleted() {
     return this->map.eof();
+}
+
+FileProcessor::~FileProcessor() {
+    this->map.close();
+    this->trabajadores.close();
 }

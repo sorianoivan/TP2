@@ -32,7 +32,3 @@ void BlockingQueue::close() {
     cond_var.notify_all();
 }
 
-BlockingQueue::~BlockingQueue() {
-    //do nothing
-}
-

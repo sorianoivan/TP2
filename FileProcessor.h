@@ -24,8 +24,8 @@ private:
 public:
     FileProcessor();
 
-    void openFiles(const char* map_filename,
-            const char* trabajadores_filename);
+    void openFiles(std::string map_filename,
+                   std::string trabajadores_filename);
 
     void processTrabajadores();
     char getRecurso();

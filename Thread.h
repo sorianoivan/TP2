@@ -7,11 +7,11 @@ class Thread {
 private:
     std::thread thread;
 public:
-    Thread();
+    Thread(); //ver q hacer con los constr q no hacen nada
     void start();
     void join();
     virtual void work() = 0;
-    virtual ~Thread();
+    virtual ~Thread() = default;
 };
 
 

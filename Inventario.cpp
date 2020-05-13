@@ -6,7 +6,7 @@ Inventario::Inventario() {
     carbon = 0;
     hierro = 0;
 
-    //recursos_disponibles  = false;
+    done_adding = false;
 }
 
 void Inventario::store(const Recurso recurso) {
@@ -30,31 +30,88 @@ void Inventario::store(const Recurso recurso) {
     if (verificarRecursos()) cond_var.notify_all();
 }
 
-Inventario::~Inventario() {
-    //do nothing
-}
-
-void Inventario::showLeft() const {
-    std::cout << "Recursos Restantes" << std::endl;
-    std::cout << "  - Trigo: " << trigo << std::endl;
-    std::cout << "  - Madera: " << madera << std::endl;
-    std::cout << "  - Carbon: " << carbon << std::endl;
-    std::cout << "  - Hierro: " << hierro << std::endl;
-}
-
-void Inventario::retrieve() {
+int Inventario::retrieveCocinero() {
     std::unique_lock<std::mutex> lock(mtx);
 
-    while (verificarRecursos()){
+    while (!verificarRecetaCocinero()){
+        if (done_adding) return 0;
+
         cond_var.wait(lock);
     }
 
+    trigo -= 2;
+    carbon--;
+
+    return 5;
+}
+
+int Inventario::retrieveCarpintero() {
+    std::unique_lock<std::mutex> lock(mtx);
+
+    while (!verificarRecetaCarpintero()){
+        if (done_adding) return 0;
+        cond_var.wait(lock);
+    }
+
+    madera -= 3;
+    hierro--;
+
+    return 2;
+}
+
+int Inventario::retrieveArmero() {
+    std::unique_lock<std::mutex> lock(mtx);
+
+    while (!verificarRecetaArmero()){
+        if (done_adding) return 0;
+        cond_var.wait(lock);
+    }
+
+    hierro -= 2;
+    carbon -= 2;
+
+    return 3;
+}
+
+bool Inventario::verificarRecetaCocinero() const{
+    return (trigo >= 2 && carbon >= 1);
+}
+
+bool Inventario::verificarRecetaCarpintero() const{
+    return (madera >= 3 && hierro >= 1);
+}
+
+bool Inventario::verificarRecetaArmero() const{
+    return (carbon >= 2 && hierro >= 2);
 }
 
 bool Inventario::verificarRecursos() const{
-    if (trigo >= 2 && carbon >= 1) return true;
-    if (madera >= 3 && hierro >= 1) return true;
-    if (carbon >= 2 && hierro >= 2) return true;
+    return (verificarRecetaCocinero() || verificarRecetaCarpintero()
+            || verificarRecetaArmero());
+}
 
-    return false;
+bool Inventario::canRetrieve() const{
+    return !(done_adding);
+}
+
+void Inventario::close(){
+    std::unique_lock<std::mutex> lock(mtx);
+    done_adding = true;
+    cond_var.notify_all();
+}
+
+int Inventario::getCantTrigo() const {
+    return trigo;
+}
+
+int Inventario::getCantMadera() const {
+    return madera;
+}
+
+int Inventario::getCantHierro() const {
+    return hierro;
+}
+
+int Inventario::getCantCarbon() const {
+    return carbon;
 }

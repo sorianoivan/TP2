@@ -21,7 +21,7 @@ public:
     Recurso pop();
     bool canPop();
     void close();
-    ~BlockingQueue();
+    ~BlockingQueue() = default;
 };
 
 

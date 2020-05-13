@@ -3,11 +3,16 @@
 
 #include <thread>
 #include <vector>
+#include <string>
 
 #include "FileProcessor.h"
 #include "BlockingQueue.h"
+#include "PuntosBeneficioMonitor.h"
 #include "Recursos.h"
 #include "Collector.h"
+#include "Cocinero.h"
+#include "Carpintero.h"
+#include "Armero.h"
 #include "Inventario.h"
 
 class TP {
@@ -17,6 +22,8 @@ private:
 
     Inventario inventario;
 
+    PuntosBeneficioMonitor puntos;
+
     BlockingQueue agricultores_queue;
     BlockingQueue leniadores_queue;
     BlockingQueue mineros_queue;
@@ -25,15 +32,20 @@ private:
     std::vector<Thread*> leniadores;
     std::vector<Thread*> mineros;
 
+    std::vector<Thread*> cocineros;
+    std::vector<Thread*> carpinteros;
+    std::vector<Thread*> armeros;
+
 public:
     TP();
-    int run(const char* map, const char* trabajadores);
+    int run(std::string map, std::string trabajadores);
     void spawnTrabajadores();
     void fillQueues();
-    void releaseTrabajadores();
-    ~TP();
+    void releaseRecolectores();
+    void releaseProductores();
+    ~TP() = default;
 
+    void mostrarResultados() const;
 };
-
 
 #endif //_TP_H

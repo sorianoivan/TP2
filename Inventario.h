@@ -15,7 +15,7 @@ private:
     int carbon;
     int hierro;
 
-    //bool recursos_disponibles;
+    bool done_adding;
 
     std::mutex mtx;
     std::condition_variable cond_var;
@@ -23,10 +23,24 @@ private:
 public:
     Inventario();
     void store(Recurso recurso);
-    void retrieve();
+    void close();
+
     bool verificarRecursos() const;
-    void showLeft() const;
-    ~Inventario();
+    bool verificarRecetaCocinero() const;
+    bool verificarRecetaCarpintero() const;
+    bool verificarRecetaArmero() const;
+
+    bool canRetrieve() const;
+    int retrieveCocinero();
+    int retrieveCarpintero();
+    int retrieveArmero();
+
+    int getCantTrigo() const;
+    int getCantMadera() const;
+    int getCantHierro() const;
+    int getCantCarbon() const;
+
+    ~Inventario() = default;
 };
 
 

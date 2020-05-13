@@ -1,5 +1,7 @@
 #include "TP.h"
 
+#include <string>
+
 #define ERROR_FILE -2
 #define ERROR 1
 
@@ -7,23 +9,21 @@ TP::TP() {
     flag = 0;
 }
 
-int TP::run(const char *map, const char *trabajadores) {
+int TP::run(std::string map, std::string trabajadores) {
     try{
-        file_processor.openFiles(map, trabajadores);
-    } catch (int e) { flag = ERROR_FILE; }
-    if(flag != 0) return ERROR;
+        file_processor.openFiles(std::move(map), std::move(trabajadores));
+    } catch(int e) {flag = ERROR_FILE;}
+    if (flag != 0) return ERROR;
 
-    spawnTrabajadores(); // falta agregar aca los productores
+    spawnTrabajadores();
     fillQueues();
-    releaseTrabajadores();
+    releaseRecolectores();
 
-    inventario.showLeft();
+    releaseProductores();
+
+    mostrarResultados();
 
     return 0;
-}
-
-TP::~TP() {
-    //do nothing
 }
 
 void TP::spawnTrabajadores() {
@@ -42,9 +42,24 @@ void TP::spawnTrabajadores() {
         mineros.push_back(new Collector(mineros_queue, inventario));
         mineros[i]->start();
     }
+
+    for (int i = 0; i < file_processor.getCantCocineros(); ++i) {
+        cocineros.push_back(new Cocinero(inventario, puntos));
+        cocineros[i]->start();
+    }
+
+    for (int i = 0; i < file_processor.getCantCarpinteros(); ++i) {
+        carpinteros.push_back(new Carpintero(inventario, puntos));
+        carpinteros[i]->start();
+    }
+
+    for (int i = 0; i < file_processor.getCantArmeros(); ++i) {
+        armeros.push_back(new Armero(inventario, puntos));
+        armeros[i]->start();
+    }
 }
 
-void TP::releaseTrabajadores() {
+void TP::releaseRecolectores() {
     for (int i = 0; i < file_processor.getCantAgricultores(); ++i) {
         agricultores[i]->join();
         delete agricultores[i];
@@ -59,6 +74,7 @@ void TP::releaseTrabajadores() {
         mineros[i]->join();
         delete mineros[i];
     }
+    inventario.close();
 }
 
 void TP::fillQueues() {
@@ -85,4 +101,32 @@ void TP::fillQueues() {
     agricultores_queue.close();
     leniadores_queue.close();
     mineros_queue.close(); //ver de poner las colas en un vector
+}
+
+void TP::releaseProductores() {
+    for (int i = 0; i < file_processor.getCantCocineros(); ++i) {
+        cocineros[i]->join();
+        delete cocineros[i];
+    }
+
+    for (int i = 0; i < file_processor.getCantCarpinteros(); ++i) {
+        carpinteros[i]->join();
+        delete carpinteros[i];
+    }
+
+    for (int i = 0; i < file_processor.getCantArmeros(); ++i) {
+        armeros[i]->join();
+        delete armeros[i];
+    }
+}
+
+void TP::mostrarResultados() const {
+    std::cout << "Recursos Restantes:" << std::endl;
+    std::cout << "  - Trigo: " << inventario.getCantTrigo() << std::endl;
+    std::cout << "  - Madera: " << inventario.getCantMadera() << std::endl;
+    std::cout << "  - Carbon: " << inventario.getCantCarbon() << std::endl;
+    std::cout << "  - Hierro: " << inventario.getCantHierro() << std::endl;
+
+    std::cout << std::endl << "Puntos de Beneficio acumulados: " <<
+        puntos.getPuntos() << std::endl;
 }

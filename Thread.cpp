@@ -1,15 +1,11 @@
 #include "Thread.h"
 
 Thread::Thread() {
-    //do nothing
+    //ver que hacer con los constructores q no hacen nada
 }
 
 void Thread::start() {
     thread = std::thread(&Thread::work, this);
-}
-
-Thread::~Thread() {
-    //do nothing
 }
 
 void Thread::join() {

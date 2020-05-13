@@ -1,5 +1,5 @@
-#ifndef TP2_COLLECTOR_H
-#define TP2_COLLECTOR_H
+#ifndef _COLLECTOR_H
+#define _COLLECTOR_H
 
 #include <iostream>
 #include <unistd.h>
@@ -11,16 +11,14 @@
 
 class Collector : public Thread{
 private:
-    Recurso recurso;
     BlockingQueue& queue;
     Inventario& inventario;
 public:
     Collector(BlockingQueue& queue, Inventario& inventario) :
         queue(queue), inventario(inventario) {}
     void work() override;
-    ~Collector();
-
+    ~Collector() = default;
 };
 
 
-#endif //TP2_COLLECTOR_H
+#endif //_COLLECTOR_H
