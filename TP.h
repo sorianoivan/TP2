@@ -52,7 +52,7 @@ private:
     void llenarColasDeRecursos();
     void mostrarResultados() const;
 
-    static void liberar(int cant, std::vector<Thread *> vector);
+    static void liberarTrabajadores(int cant, std::vector<Thread *> vector);
 
     void finalizar();
 };
