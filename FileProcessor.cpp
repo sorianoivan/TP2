@@ -1,5 +1,7 @@
 #include "FileProcessor.h"
 
+#include <string>
+
 FileProcessor::FileProcessor() {
     cant_agricultores = 0;
     cant_leniadores = 0;

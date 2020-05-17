@@ -9,9 +9,15 @@ private:
     std::mutex mtx;
 
 public:
-    PuntosBeneficioMonitor() : puntos(0) {}
-    void store(int puntos_a_depositar);
+    /* Constructor */
+    PuntosBeneficioMonitor();
+
+    /* Suma los puntos correspondientes */
+    void store(const int puntos_a_depositar);
+    /* Devuelve la cantidad de puntos */
     unsigned int getPuntos() const;
+
+    /* Destructor */
     ~PuntosBeneficioMonitor() = default;
 };
 

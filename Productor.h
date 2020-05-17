@@ -15,11 +15,16 @@ private:
     int tipo;
 
 public:
+    /* Constructor */
     Productor(Inventario &inventario, PuntosBeneficioMonitor& puntos,
             int tipo) : inventario(inventario), puntos(puntos), tipo(tipo) {}
 
+    /* Si los hay, consume los recursos del inventario, espera 60ms y deposita
+     * los puntos correspondientes */
     void work() override;
-    ~Productor() = default;
+
+    /* Destructor */
+    ~Productor();
 };
 
 

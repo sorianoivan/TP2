@@ -1,6 +1,10 @@
 #include "ColaBloqueante.h"
 
-void ColaBloqueante::push(const Recurso recurso) {
+ColaBloqueante::ColaBloqueante() {
+    this->cerrada = false;
+}
+
+void ColaBloqueante::push(Recurso recurso) {
     std::unique_lock<std::mutex> lock(mtx);
     queue.push(recurso);
     cond_var.notify_all();
@@ -10,8 +14,10 @@ Recurso ColaBloqueante::pop() {
     std::unique_lock<std::mutex> lock(mtx);
 
     while (queue.empty()){
-        if (done_pushing){
-            return NoRecurso;
+        if (cerrada){
+            return NoRecurso;//Cuando un recolector hace pop y recibe
+                             //NoRecurso sabe que la cola termino
+                             //de llenarse y termina de trabajar
         }
         cond_var.wait(lock);
     }
@@ -21,12 +27,14 @@ Recurso ColaBloqueante::pop() {
 }
 
 bool ColaBloqueante::puedoQuitar() {
-    return !(queue.empty() && done_pushing);
+    return !(queue.empty() && cerrada);
 }
 
 void ColaBloqueante::cerrar() {
     std::unique_lock<std::mutex> lock(mtx);
-    done_pushing = true;
+    cerrada = true;
     cond_var.notify_all();
 }
+
+ColaBloqueante::~ColaBloqueante() {}
 

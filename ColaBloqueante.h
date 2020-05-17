@@ -1,5 +1,5 @@
-#ifndef _BLOCKINGQUEUE_H
-#define _BLOCKINGQUEUE_H
+#ifndef _COLABLOQUEANTE_H
+#define _COLABLOQUEANTE_H
 
 #include <queue>
 #include <mutex>
@@ -10,19 +10,29 @@
 
 class ColaBloqueante {
 private:
-    bool done_pushing;
+    bool cerrada;
     std::mutex mtx;
     std::condition_variable cond_var;
     std::queue<Recurso> queue;
 
 public:
-    ColaBloqueante() : done_pushing(false) {}
+    /* Constructor */
+    ColaBloqueante();
+
+    /* Pone un recurso al final de la cola */
     void push(Recurso recurso);
+    /* Quita el recurso del principio de la cola.
+     * Si la cola esta vacia y fue cerrada devuelve
+     * NoRecurso */
     Recurso pop();
+    /* Retorna true si la cola no esta vacia y cerrada,
+     * false en caso contrario */
     bool puedoQuitar();
+    /* Cierra la cola y notifica a todos los threads que estan esperando */
     void cerrar();
-    ~ColaBloqueante() = default;
+
+    /* Destructor */
+    ~ColaBloqueante();
 };
 
-
-#endif //_BLOCKINGQUEUE_H
+#endif //_COLABLOQUEANTE_H

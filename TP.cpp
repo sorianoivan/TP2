@@ -1,5 +1,8 @@
 #include "TP.h"
 
+#include <string>
+#include <vector>
+
 TP::TP() {
     flag = 0;
 }
@@ -8,50 +11,52 @@ int TP::ejecutar(const std::string& mapa, const std::string& trabajadores) {
     flag = file_processor.abrirArchivos(trabajadores, mapa);
     if (flag != 0) return ERROR;
 
-    invocarTrabajadores();
+    _invocarTrabajadores();
 
-    llenarColasDeRecursos();
+    _llenarColasDeRecursos();
 
-    finalizar();
+    _finalizar();
 
-    mostrarResultados();
+    _mostrarResultados();
 
     return OK;
 }
 
-void TP::crearRecolectores(int cant, std::vector<Thread*>& vector,
-                           ColaBloqueante& queue){
+void TP::_crearRecolectores(const int cant, std::vector<Thread*>& vector,
+                            ColaBloqueante& cola_recolector){
     for (int i = 0; i < cant; ++i) {
-        vector.push_back(new Recolector(queue, inventario));
+        vector.push_back(new Recolector(cola_recolector, inventario));
         vector[i]->start();
     }
 }
 
-void TP::crearProductores(int cant, std::vector<Thread*>& vector,
-        int tipo){
+void TP::_crearProductores(const int cant, std::vector<Thread*>& vector,
+                           const int tipo){
     for (int i = 0; i < cant; ++i) {
         vector.push_back(new Productor(inventario, puntos, tipo));
         vector[i]->start();
     }
 }
 
-void TP::invocarTrabajadores() {
+void TP::_invocarTrabajadores() {
     file_processor.processTrabajadores();
 
-    crearRecolectores(file_processor.getCantAgricultores(), agricultores,
-                      cola_agricultores);
-    crearRecolectores(file_processor.getCantLeniadores(), leniadores,
-                      cola_leniadores);
-    crearRecolectores(file_processor.getCantMineros(), mineros,
-                      cola_mineros);
+    _crearRecolectores(file_processor.getCantAgricultores(), agricultores,
+                       cola_agricultores);
+    _crearRecolectores(file_processor.getCantLeniadores(), leniadores,
+                       cola_leniadores);
+    _crearRecolectores(file_processor.getCantMineros(), mineros,
+                       cola_mineros);
 
-    crearProductores(file_processor.getCantCocineros(), cocineros, COCINERO);
-    crearProductores(file_processor.getCantCarpinteros(), carpinteros, CARPINTERO);
-    crearProductores(file_processor.getCantArmeros(), armeros, ARMERO);
-
+    _crearProductores(file_processor.getCantCocineros(), cocineros, COCINERO);
+    _crearProductores(file_processor.getCantCarpinteros(), carpinteros,
+            CARPINTERO);
+    _crearProductores(file_processor.getCantArmeros(), armeros, ARMERO);
 }
 
-void TP::llenarColasDeRecursos() {
+/* Esta funcion se pasa de las 20 lineas unicamente por la estructura switch
+ * por lo que no veo razon por la cual se deberia modularizar mas */
+void TP::_llenarColasDeRecursos() {
     char curr_recurso;
     while (!file_processor.recursosTerminados()){
         curr_recurso = file_processor.getRecurso();
@@ -77,26 +82,26 @@ void TP::llenarColasDeRecursos() {
     cola_mineros.cerrar(); //ver de poner las colas en un vector
 }
 
-void TP::finalizar() {
-    liberarTrabajadores(file_processor.getCantAgricultores(), agricultores);
-    liberarTrabajadores(file_processor.getCantLeniadores(), leniadores);
-    liberarTrabajadores(file_processor.getCantMineros(), mineros);
+void TP::_finalizar() {
+    _liberarTrabajadores(file_processor.getCantAgricultores(), agricultores);
+    _liberarTrabajadores(file_processor.getCantLeniadores(), leniadores);
+    _liberarTrabajadores(file_processor.getCantMineros(), mineros);
 
     inventario.cerrar();
 
-    liberarTrabajadores(file_processor.getCantCocineros(), cocineros);
-    liberarTrabajadores(file_processor.getCantCarpinteros(), carpinteros);
-    liberarTrabajadores(file_processor.getCantArmeros(), armeros);
+    _liberarTrabajadores(file_processor.getCantCocineros(), cocineros);
+    _liberarTrabajadores(file_processor.getCantCarpinteros(), carpinteros);
+    _liberarTrabajadores(file_processor.getCantArmeros(), armeros);
 }
 
-void TP::liberarTrabajadores(int cant, std::vector<Thread*> vector) {
+void TP::_liberarTrabajadores(const int cant, std::vector<Thread*> vector) {
     for (int i = 0; i < cant; ++i) {
         vector[i]->join();
         delete vector[i];
     }
 }
 
-void TP::mostrarResultados() const {
+void TP::_mostrarResultados() const {
     std::cout << "Recursos restantes:" << std::endl;
     std::cout << "  - Trigo: " << inventario.getCantTrigo() << std::endl;
     std::cout << "  - Madera: " << inventario.getCantMadera() << std::endl;
@@ -106,3 +111,5 @@ void TP::mostrarResultados() const {
     std::cout << std::endl << "Puntos de Beneficio acumulados: " <<
         puntos.getPuntos() << std::endl;
 }
+
+TP::~TP() {}

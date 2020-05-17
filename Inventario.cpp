@@ -1,12 +1,23 @@
 #include "Inventario.h"
 
+#define PUNTOS_COCINERO 5
+#define PUNTOS_CARPINTERO 2
+#define PUNTOS_ARMERO 3
+
+#define RECETA_COCINERO_TRIGO 2
+#define RECETA_COCINERO_CARBON 1
+#define RECETA_CARPINTERO_MADERA 3
+#define RECETA_CARPINTERO_HIERRO 1
+#define RECETA_ARMERO_CARBON 2
+#define RECETA_ARMERO_HIERRO 2
+
 Inventario::Inventario() {
     trigo = 0;
     madera = 0;
     carbon = 0;
     hierro = 0;
 
-    done_adding = false;
+    cerrado = false;
 }
 
 void Inventario::store(const Recurso recurso) {
@@ -30,33 +41,33 @@ void Inventario::store(const Recurso recurso) {
     if (verificarRecursos()) cond_var.notify_all();
 }
 
-int Inventario::_consumir(int tipo) {//privada
+int Inventario::_consumir(const int tipo) {//privada
     switch (tipo) {
         case COCINERO:
-            trigo -= 2;
-            carbon -= 1;
-            return 5;
+            trigo -= RECETA_COCINERO_TRIGO;
+            carbon -= RECETA_COCINERO_CARBON;
+            return PUNTOS_COCINERO;
 
         case CARPINTERO:
-            madera -= 3;
-            hierro -= 1;
-            return 2;
+            madera -= RECETA_CARPINTERO_MADERA;
+            hierro -= RECETA_CARPINTERO_HIERRO;
+            return PUNTOS_CARPINTERO;
 
         case ARMERO:
-            hierro -= 2;
-            carbon -= 2;
-            return 3;
+            hierro -= RECETA_ARMERO_HIERRO;
+            carbon -= RECETA_ARMERO_CARBON;
+            return PUNTOS_ARMERO;
 
         default:
             return 0;
     }
 }
 
-int Inventario::consumirRecursos(int tipo){
+int Inventario::consumirRecursos(const int tipo){
     std::unique_lock<std::mutex> lock(mtx);
 
     while (!verificarReceta(tipo)){
-        if (done_adding) return 0;
+        if (cerrado) return 0;
         cond_var.wait(lock);
     }
     return _consumir(tipo);
@@ -64,18 +75,21 @@ int Inventario::consumirRecursos(int tipo){
 
 
 bool Inventario::_verificarRecetaCocinero() const{//privada
-    return (trigo >= 2 && carbon >= 1);
+    return (trigo >= RECETA_COCINERO_TRIGO &&
+            carbon >= RECETA_COCINERO_CARBON);
 }
 
 bool Inventario::_verificarRecetaCarpintero() const{//privada
-    return (madera >= 3 && hierro >= 1);
+    return (madera >= RECETA_CARPINTERO_MADERA &&
+            hierro >= RECETA_CARPINTERO_HIERRO);
 }
 
 bool Inventario::_verificarRecetaArmero() const{//privada
-    return (carbon >= 2 && hierro >= 2);
+    return (carbon >= RECETA_ARMERO_CARBON &&
+            hierro >= RECETA_ARMERO_HIERRO);
 }
 
-bool Inventario::verificarReceta(int tipo) const {
+bool Inventario::verificarReceta(const int tipo) const {
     switch (tipo) {
         case COCINERO:
             return _verificarRecetaCocinero();
@@ -97,12 +111,12 @@ bool Inventario::verificarRecursos() const{
 }
 
 bool Inventario::puedoConsumir() const{
-    return !(done_adding);
+    return !(cerrado);
 }
 
 void Inventario::cerrar(){
     std::unique_lock<std::mutex> lock(mtx);
-    done_adding = true;
+    cerrado = true;
     cond_var.notify_all();
 }
 
@@ -121,3 +135,5 @@ int Inventario::getCantHierro() const {
 int Inventario::getCantCarbon() const {
     return carbon;
 }
+
+Inventario::~Inventario() {}

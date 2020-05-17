@@ -7,11 +7,20 @@ class Thread {
 private:
     std::thread thread;
 public:
-    Thread(); //ver q hacer con los constr q no hacen nada
+    /* Constructor */
+    Thread();
+
+    /* Ejecuta el thread con el metodo abstracto work, que sera
+     * implementado por las clases hijas */
     void start();
+    /* Bloquea el thread hasta que los otros completen su trabajo */
     void join();
+
+
     virtual void work() = 0;
-    virtual ~Thread() = default;
+
+    /* Destructor */
+    virtual ~Thread();
 };
 
 

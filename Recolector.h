@@ -1,5 +1,5 @@
-#ifndef _COLLECTOR_H
-#define _COLLECTOR_H
+#ifndef _RECOLECTOR_H
+#define _RECOLECTOR_H
 
 #include <iostream>
 #include <unistd.h>
@@ -14,11 +14,17 @@ private:
     ColaBloqueante& queue;
     Inventario& inventario;
 public:
+    /* Constructor */
     Recolector(ColaBloqueante& queue, Inventario& inventario) :
         queue(queue), inventario(inventario) {}
+
+    /* Si hay, saca un recurso de la cola, espera 50ms y lo deposita
+     * en el inventario */
     void work() override;
-    ~Recolector() = default;
+
+    /* Destructor */
+    ~Recolector();
 };
 
 
-#endif //_COLLECTOR_H
+#endif //_RECOLECTOR_H
