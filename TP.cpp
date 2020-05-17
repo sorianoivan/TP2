@@ -78,18 +78,18 @@ void TP::llenarColasDeRecursos() {
 }
 
 void TP::finalizar() {
-    liberar(file_processor.getCantAgricultores(), agricultores);
-    liberar(file_processor.getCantLeniadores(), leniadores);
-    liberar(file_processor.getCantMineros(), mineros);
+    liberarTrabajadores(file_processor.getCantAgricultores(), agricultores);
+    liberarTrabajadores(file_processor.getCantLeniadores(), leniadores);
+    liberarTrabajadores(file_processor.getCantMineros(), mineros);
 
     inventario.cerrar();
 
-    liberar(file_processor.getCantCocineros(), cocineros);
-    liberar(file_processor.getCantCarpinteros(), carpinteros);
-    liberar(file_processor.getCantArmeros(), armeros);
+    liberarTrabajadores(file_processor.getCantCocineros(), cocineros);
+    liberarTrabajadores(file_processor.getCantCarpinteros(), carpinteros);
+    liberarTrabajadores(file_processor.getCantArmeros(), armeros);
 }
 
-void TP::liberar(int cant, std::vector<Thread*> vector) {
+void TP::liberarTrabajadores(int cant, std::vector<Thread*> vector) {
     for (int i = 0; i < cant; ++i) {
         vector[i]->join();
         delete vector[i];
@@ -97,7 +97,7 @@ void TP::liberar(int cant, std::vector<Thread*> vector) {
 }
 
 void TP::mostrarResultados() const {
-    std::cout << "Recursos Restantes:" << std::endl;
+    std::cout << "Recursos restantes:" << std::endl;
     std::cout << "  - Trigo: " << inventario.getCantTrigo() << std::endl;
     std::cout << "  - Madera: " << inventario.getCantMadera() << std::endl;
     std::cout << "  - Carbon: " << inventario.getCantCarbon() << std::endl;
