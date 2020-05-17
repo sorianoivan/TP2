@@ -6,14 +6,13 @@
 #include <string>
 
 #include "FileProcessor.h"
-#include "BlockingQueue.h"
+#include "ColaBloqueante.h"
 #include "PuntosBeneficioMonitor.h"
 #include "Recursos.h"
-#include "Collector.h"
-#include "Cocinero.h"
-#include "Carpintero.h"
-#include "Armero.h"
+#include "Recolector.h"
+#include "Productor.h"
 #include "Inventario.h"
+#include "Constantes.h"
 
 class TP {
 private:
@@ -24,9 +23,9 @@ private:
 
     PuntosBeneficioMonitor puntos;
 
-    BlockingQueue agricultores_queue;
-    BlockingQueue leniadores_queue;
-    BlockingQueue mineros_queue;
+    ColaBloqueante cola_agricultores;
+    ColaBloqueante cola_leniadores;
+    ColaBloqueante cola_mineros;
 
     std::vector<Thread*> agricultores;
     std::vector<Thread*> leniadores;
@@ -38,14 +37,24 @@ private:
 
 public:
     TP();
-    int run(std::string map, std::string trabajadores);
-    void spawnTrabajadores();
-    void fillQueues();
-    void releaseRecolectores();
-    void releaseProductores();
+    /* Ejecuta el tp */
+    int ejecutar(const std::string& mapa, const std::string& trabajadores);
+    /* Invoca recolectores y productores */
+
     ~TP() = default;
 
+private:
+    void invocarTrabajadores();
+
+    void crearRecolectores(int cant, std::vector<Thread *>& vector,
+                           ColaBloqueante& queue);
+    void crearProductores(int cant, std::vector<Thread *> &vector, int tipo);
+    void llenarColasDeRecursos();
     void mostrarResultados() const;
+
+    static void liberar(int cant, std::vector<Thread *> vector);
+
+    void finalizar();
 };
 
 #endif //_TP_H

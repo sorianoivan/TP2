@@ -1,14 +1,12 @@
-#include "BlockingQueue.h"
+#include "ColaBloqueante.h"
 
-#define CLOSED_EXCEPTION -3
-
-void BlockingQueue::push(const Recurso recurso) {
+void ColaBloqueante::push(const Recurso recurso) {
     std::unique_lock<std::mutex> lock(mtx);
     queue.push(recurso);
     cond_var.notify_all();
 }
 
-Recurso BlockingQueue::pop() {
+Recurso ColaBloqueante::pop() {
     std::unique_lock<std::mutex> lock(mtx);
 
     while (queue.empty()){
@@ -22,11 +20,11 @@ Recurso BlockingQueue::pop() {
     return recurso;
 }
 
-bool BlockingQueue::canPop() {
+bool ColaBloqueante::puedoQuitar() {
     return !(queue.empty() && done_pushing);
 }
 
-void BlockingQueue::close() {
+void ColaBloqueante::cerrar() {
     std::unique_lock<std::mutex> lock(mtx);
     done_pushing = true;
     cond_var.notify_all();

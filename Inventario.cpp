@@ -30,71 +30,77 @@ void Inventario::store(const Recurso recurso) {
     if (verificarRecursos()) cond_var.notify_all();
 }
 
-int Inventario::retrieveCocinero() {
-    std::unique_lock<std::mutex> lock(mtx);
+int Inventario::_consumir(int tipo) {//privada
+    switch (tipo) {
+        case COCINERO:
+            trigo -= 2;
+            carbon -= 1;
+            return 5;
 
-    while (!verificarRecetaCocinero()){
-        if (done_adding) return 0;
+        case CARPINTERO:
+            madera -= 3;
+            hierro -= 1;
+            return 2;
 
-        cond_var.wait(lock);
+        case ARMERO:
+            hierro -= 2;
+            carbon -= 2;
+            return 3;
+
+        default:
+            return 0;
     }
-
-    trigo -= 2;
-    carbon--;
-
-    return 5;
 }
 
-int Inventario::retrieveCarpintero() {
+int Inventario::consumirRecursos(int tipo){
     std::unique_lock<std::mutex> lock(mtx);
 
-    while (!verificarRecetaCarpintero()){
-        if (done_adding) return 0;
-        cond_var.wait(lock);
-    }
-
-    madera -= 3;
-    hierro--;
-
-    return 2;
-}
-
-int Inventario::retrieveArmero() {
-    std::unique_lock<std::mutex> lock(mtx);
-
-    while (!verificarRecetaArmero()){
+    while (!verificarReceta(tipo)){
         if (done_adding) return 0;
         cond_var.wait(lock);
     }
-
-    hierro -= 2;
-    carbon -= 2;
-
-    return 3;
+    return _consumir(tipo);
 }
 
-bool Inventario::verificarRecetaCocinero() const{
+
+bool Inventario::_verificarRecetaCocinero() const{//privada
     return (trigo >= 2 && carbon >= 1);
 }
 
-bool Inventario::verificarRecetaCarpintero() const{
+bool Inventario::_verificarRecetaCarpintero() const{//privada
     return (madera >= 3 && hierro >= 1);
 }
 
-bool Inventario::verificarRecetaArmero() const{
+bool Inventario::_verificarRecetaArmero() const{//privada
     return (carbon >= 2 && hierro >= 2);
 }
 
-bool Inventario::verificarRecursos() const{
-    return (verificarRecetaCocinero() || verificarRecetaCarpintero()
-            || verificarRecetaArmero());
+bool Inventario::verificarReceta(int tipo) const {
+    switch (tipo) {
+        case COCINERO:
+            return _verificarRecetaCocinero();
+
+        case CARPINTERO:
+            return _verificarRecetaCarpintero();
+
+        case ARMERO:
+            return _verificarRecetaArmero();
+
+        default:
+            return false;
+    }
 }
 
-bool Inventario::canRetrieve() const{
+bool Inventario::verificarRecursos() const{
+    return (_verificarRecetaCocinero() || _verificarRecetaCarpintero()
+            || _verificarRecetaArmero());
+}
+
+bool Inventario::puedoConsumir() const{
     return !(done_adding);
 }
 
-void Inventario::close(){
+void Inventario::cerrar(){
     std::unique_lock<std::mutex> lock(mtx);
     done_adding = true;
     cond_var.notify_all();

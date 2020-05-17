@@ -8,7 +8,7 @@
 #include "Recursos.h"
 
 
-class BlockingQueue {
+class ColaBloqueante {
 private:
     bool done_pushing;
     std::mutex mtx;
@@ -16,12 +16,12 @@ private:
     std::queue<Recurso> queue;
 
 public:
-    BlockingQueue() : done_pushing(false) {}
+    ColaBloqueante() : done_pushing(false) {}
     void push(Recurso recurso);
     Recurso pop();
-    bool canPop();
-    void close();
-    ~BlockingQueue() = default;
+    bool puedoQuitar();
+    void cerrar();
+    ~ColaBloqueante() = default;
 };
 
 

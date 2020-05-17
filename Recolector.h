@@ -4,20 +4,20 @@
 #include <iostream>
 #include <unistd.h>
 
-#include "BlockingQueue.h"
+#include "ColaBloqueante.h"
 #include "Recursos.h"
 #include "Thread.h"
 #include "Inventario.h"
 
-class Collector : public Thread{
+class Recolector : public Thread{
 private:
-    BlockingQueue& queue;
+    ColaBloqueante& queue;
     Inventario& inventario;
 public:
-    Collector(BlockingQueue& queue, Inventario& inventario) :
+    Recolector(ColaBloqueante& queue, Inventario& inventario) :
         queue(queue), inventario(inventario) {}
     void work() override;
-    ~Collector() = default;
+    ~Recolector() = default;
 };
 
 

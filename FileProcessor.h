@@ -7,10 +7,11 @@
 #include <string>
 
 #include "Recursos.h"
+#include "Constantes.h"
 
 class FileProcessor {
 private:
-    std::ifstream map;
+    std::ifstream mapa;
     std::ifstream trabajadores;
 
     int cant_agricultores;
@@ -24,12 +25,20 @@ private:
 public:
     FileProcessor();
 
-    void openFiles(std::string map_filename,
-                   std::string trabajadores_filename);
+    /* Abre los archivos de mapa y trabajadores. Devuelve 0 si los archivos
+     * se abrieron bien y ERROR_ARCHIVO en caso contrario*/
+    int abrirArchivos(const std::string& mapa_filename,
+                      const std::string& trabajadores_filename);
 
+    /* Procesa el archivo de trabajadores para obtener la cantidad
+     * de cada tipo de trabajador*/
     void processTrabajadores();
+
+    /* Devuelve el recurso leido */
     char getRecurso();
-    bool recursosDepleted();
+
+    /* Devuelve true si ya no quedan mas recursos por leer */
+    bool recursosTerminados() const;
 
     int getCantAgricultores() const;
     int getCantLeniadores() const;
@@ -38,6 +47,7 @@ public:
     int getCantCarpinteros() const;
     int getCantArmeros() const;
 
+    /* Cierra los archivos */
     ~FileProcessor();
 };
 

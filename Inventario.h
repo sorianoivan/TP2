@@ -6,6 +6,7 @@
 #include <condition_variable>
 
 #include "Recursos.h"
+#include "Constantes.h"
 
 
 class Inventario {
@@ -23,14 +24,14 @@ private:
 public:
     Inventario();
     void store(Recurso recurso);
-    void close();
+    void cerrar();
 
     bool verificarRecursos() const;
-    bool verificarRecetaCocinero() const;
-    bool verificarRecetaCarpintero() const;
-    bool verificarRecetaArmero() const;
+    bool _verificarRecetaCocinero() const;
+    bool _verificarRecetaCarpintero() const;
+    bool _verificarRecetaArmero() const;
 
-    bool canRetrieve() const;
+    bool puedoConsumir() const;
     int retrieveCocinero();
     int retrieveCarpintero();
     int retrieveArmero();
@@ -41,6 +42,12 @@ public:
     int getCantCarbon() const;
 
     ~Inventario() = default;
+
+    bool verificarReceta(int tipo) const;
+
+    int consumirRecursos(int tipo);
+
+    int _consumir(int tipo);
 };
 
 

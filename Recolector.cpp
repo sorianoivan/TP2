@@ -1,8 +1,8 @@
-#include "Collector.h"
+#include "Recolector.h"
 
-void Collector::work() {
+void Recolector::work() {
     Recurso recurso;
-    while (this->queue.canPop()) {
+    while (this->queue.puedoQuitar()) {
         recurso = this->queue.pop();
         usleep(50000);
         if (recurso != NoRecurso){

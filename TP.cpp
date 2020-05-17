@@ -1,127 +1,103 @@
 #include "TP.h"
 
-#include <string>
-
-#define ERROR_FILE -2
-#define ERROR 1
-
 TP::TP() {
     flag = 0;
 }
 
-int TP::run(std::string trabajadores, std::string map) {
-    try{
-        file_processor.openFiles(std::move(map), std::move(trabajadores));
-    } catch(int e) {flag = ERROR_FILE;}
+int TP::ejecutar(const std::string& mapa, const std::string& trabajadores) {
+    flag = file_processor.abrirArchivos(trabajadores, mapa);
     if (flag != 0) return ERROR;
 
-    spawnTrabajadores();
-    fillQueues();
-    releaseRecolectores();
+    invocarTrabajadores();
 
-    releaseProductores();
+    llenarColasDeRecursos();
+
+    finalizar();
 
     mostrarResultados();
 
-    return 0;
+    return OK;
 }
 
-void TP::spawnTrabajadores() {
+void TP::crearRecolectores(int cant, std::vector<Thread*>& vector,
+                           ColaBloqueante& queue){
+    for (int i = 0; i < cant; ++i) {
+        vector.push_back(new Recolector(queue, inventario));
+        vector[i]->start();
+    }
+}
+
+void TP::crearProductores(int cant, std::vector<Thread*>& vector,
+        int tipo){
+    for (int i = 0; i < cant; ++i) {
+        vector.push_back(new Productor(inventario, puntos, tipo));
+        vector[i]->start();
+    }
+}
+
+void TP::invocarTrabajadores() {
     file_processor.processTrabajadores();
-    for (int i = 0; i < file_processor.getCantAgricultores(); ++i) {
-        agricultores.push_back(new Collector(agricultores_queue, inventario));
-        agricultores[i]->start();
-    }
 
-    for (int i = 0; i < file_processor.getCantLeniadores(); ++i) {
-        leniadores.push_back(new Collector(leniadores_queue, inventario));
-        leniadores[i]->start();
-    }
+    crearRecolectores(file_processor.getCantAgricultores(), agricultores,
+                      cola_agricultores);
+    crearRecolectores(file_processor.getCantLeniadores(), leniadores,
+                      cola_leniadores);
+    crearRecolectores(file_processor.getCantMineros(), mineros,
+                      cola_mineros);
 
-    for (int i = 0; i < file_processor.getCantMineros(); ++i) {
-        mineros.push_back(new Collector(mineros_queue, inventario));
-        mineros[i]->start();
-    }
+    crearProductores(file_processor.getCantCocineros(), cocineros, COCINERO);
+    crearProductores(file_processor.getCantCarpinteros(), carpinteros, CARPINTERO);
+    crearProductores(file_processor.getCantArmeros(), armeros, ARMERO);
 
-    for (int i = 0; i < file_processor.getCantCocineros(); ++i) {
-        cocineros.push_back(new Cocinero(inventario, puntos));
-        cocineros[i]->start();
-    }
-
-    for (int i = 0; i < file_processor.getCantCarpinteros(); ++i) {
-        carpinteros.push_back(new Carpintero(inventario, puntos));
-        carpinteros[i]->start();
-    }
-
-    for (int i = 0; i < file_processor.getCantArmeros(); ++i) {
-        armeros.push_back(new Armero(inventario, puntos));
-        armeros[i]->start();
-    }
 }
 
-void TP::releaseRecolectores() {
-    for (int i = 0; i < file_processor.getCantAgricultores(); ++i) {
-        agricultores[i]->join();
-        delete agricultores[i];
-    }
-
-    for (int i = 0; i < file_processor.getCantLeniadores(); ++i) {
-        leniadores[i]->join();
-        delete leniadores[i];
-    }
-
-    for (int i = 0; i < file_processor.getCantMineros(); ++i) {
-        mineros[i]->join();
-        delete mineros[i];
-    }
-    inventario.close();
-}
-
-void TP::fillQueues() {
+void TP::llenarColasDeRecursos() {
     char curr_recurso;
-    while (!file_processor.recursosDepleted()){
+    while (!file_processor.recursosTerminados()){
         curr_recurso = file_processor.getRecurso();
         switch (curr_recurso) {
             case 'T':
-                agricultores_queue.push(Trigo);
+                cola_agricultores.push(Trigo);
                 break;
             case 'M':
-                leniadores_queue.push(Madera);
+                cola_leniadores.push(Madera);
                 break;
             case 'C':
-                mineros_queue.push(Carbon);
+                cola_mineros.push(Carbon);
                 break;
             case 'H':
-                mineros_queue.push(Hierro);
+                cola_mineros.push(Hierro);
                 break;
             default :
                 break;
         }
     }
-    agricultores_queue.close();
-    leniadores_queue.close();
-    mineros_queue.close(); //ver de poner las colas en un vector
+    cola_agricultores.cerrar();
+    cola_leniadores.cerrar();
+    cola_mineros.cerrar(); //ver de poner las colas en un vector
 }
 
-void TP::releaseProductores() {
-    for (int i = 0; i < file_processor.getCantCocineros(); ++i) {
-        cocineros[i]->join();
-        delete cocineros[i];
-    }
+void TP::finalizar() {
+    liberar(file_processor.getCantAgricultores(), agricultores);
+    liberar(file_processor.getCantLeniadores(), leniadores);
+    liberar(file_processor.getCantMineros(), mineros);
 
-    for (int i = 0; i < file_processor.getCantCarpinteros(); ++i) {
-        carpinteros[i]->join();
-        delete carpinteros[i];
-    }
+    inventario.cerrar();
 
-    for (int i = 0; i < file_processor.getCantArmeros(); ++i) {
-        armeros[i]->join();
-        delete armeros[i];
+    liberar(file_processor.getCantCocineros(), cocineros);
+    liberar(file_processor.getCantCarpinteros(), carpinteros);
+    liberar(file_processor.getCantArmeros(), armeros);
+}
+
+void TP::liberar(int cant, std::vector<Thread*> vector) {
+    for (int i = 0; i < cant; ++i) {
+        vector[i]->join();
+        delete vector[i];
     }
 }
 
 void TP::mostrarResultados() const {
-    std::cout << "Recursos restantes:" << std::endl;
+    std::cout << "Recursos Restantes:" << std::endl;
     std::cout << "  - Trigo: " << inventario.getCantTrigo() << std::endl;
     std::cout << "  - Madera: " << inventario.getCantMadera() << std::endl;
     std::cout << "  - Carbon: " << inventario.getCantCarbon() << std::endl;

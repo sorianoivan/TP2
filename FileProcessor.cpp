@@ -1,9 +1,5 @@
 #include "FileProcessor.h"
 
-#include <string>
-
-#define ERROR_FILE -2
-
 FileProcessor::FileProcessor() {
     cant_agricultores = 0;
     cant_leniadores = 0;
@@ -14,24 +10,34 @@ FileProcessor::FileProcessor() {
     cant_armeros = 0;
 }
 
-void FileProcessor::openFiles(std::string map_filename,
-                              std::string trabajadores_filename) {
-    this->map.open(map_filename);
-    if (!this->map.is_open()) throw ERROR_FILE;
+int FileProcessor::abrirArchivos(const std::string& mapa_filename,
+                                 const std::string& trabajadores_filename) {
+    this->mapa.open(mapa_filename);
+    if (!this->mapa.is_open()){
+        std::cerr << "Error abriendo el archivo de mapa" << std::endl;
+        return ERROR_ARCHIVO;
+    }
 
     this->trabajadores.open(trabajadores_filename);
-    if (!this->trabajadores.is_open()) throw ERROR_FILE;
+    if (!this->trabajadores.is_open()){
+        std::cerr << "Error abriendo el archivo de trabajadores" << std::endl;
+        return ERROR_ARCHIVO;
+    }
+
+    return OK;
 }
 
 char FileProcessor::getRecurso() {
-    return this->map.get();
+    return this->mapa.get();
 }
 
 void FileProcessor::processTrabajadores() {
     std::string curr_worker;
     int curr_len = 0;
     while (!this->trabajadores.eof()) {
+        //Leo el tipo de trabajador
         std::getline(this->trabajadores, curr_worker, '=');
+        //Leo la cantidad de trabajadores del tipo que lei
         this->trabajadores >> curr_len;
         if (curr_worker == "Agricultores") cant_agricultores = curr_len;
         else if (curr_worker == "Leniadores") cant_leniadores = curr_len;
@@ -39,7 +45,7 @@ void FileProcessor::processTrabajadores() {
         else if (curr_worker == "Cocineros") cant_cocineros = curr_len;
         else if (curr_worker == "Carpinteros") cant_carpinteros = curr_len;
         else if (curr_worker == "Armeros") cant_armeros = curr_len;
-        this->trabajadores.get();  //agarra el \n que no me interesa
+        this->trabajadores.get();  //leo el \n que no me interesa
         this->trabajadores.peek(); //este es para ver el EOF y que termine
     }
 }
@@ -68,11 +74,11 @@ int FileProcessor:: getCantArmeros() const{
     return this->cant_armeros;
 }
 
-bool FileProcessor::recursosDepleted() {
-    return this->map.eof();
+bool FileProcessor::recursosTerminados() const{
+    return this->mapa.eof();
 }
 
 FileProcessor::~FileProcessor() {
-    this->map.close();
+    this->mapa.close();
     this->trabajadores.close();
 }
