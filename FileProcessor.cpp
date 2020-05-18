@@ -25,7 +25,6 @@ int FileProcessor::abrirArchivos(const std::string& mapa_filename,
         std::cerr << "Error abriendo el archivo de trabajadores" << std::endl;
         return ERROR_ARCHIVO;
     }
-
     return OK;
 }
 
@@ -37,9 +36,9 @@ void FileProcessor::processTrabajadores() {
     std::string curr_worker;
     int curr_len = 0;
     while (!this->trabajadores.eof()) {
-        //Leo el tipo de trabajador
+        //Leo el tipo_productor de trabajador
         std::getline(this->trabajadores, curr_worker, '=');
-        //Leo la cantidad de trabajadores del tipo que lei
+        //Leo la cantidad de trabajadores del tipo_productor que lei
         this->trabajadores >> curr_len;
         if (curr_worker == "Agricultores") cant_agricultores = curr_len;
         else if (curr_worker == "Leniadores") cant_leniadores = curr_len;

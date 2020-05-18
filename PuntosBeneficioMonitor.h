@@ -13,12 +13,12 @@ public:
     PuntosBeneficioMonitor();
 
     /* Suma los puntos correspondientes */
-    void store(const int puntos_a_depositar);
+    void depositar(const unsigned int puntos_a_depositar);
     /* Devuelve la cantidad de puntos */
     unsigned int getPuntos() const;
 
     /* Destructor */
-    ~PuntosBeneficioMonitor() = default;
+    ~PuntosBeneficioMonitor();
 };
 
 

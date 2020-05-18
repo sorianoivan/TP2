@@ -12,16 +12,17 @@ class Productor : public Thread {
 private:
     Inventario& inventario;
     PuntosBeneficioMonitor& puntos;
-    int tipo;
+    int tipo_productor;
 
 public:
     /* Constructor */
     Productor(Inventario &inventario, PuntosBeneficioMonitor& puntos,
-            int tipo) : inventario(inventario), puntos(puntos), tipo(tipo) {}
+            int tipo) : inventario(inventario), puntos(puntos), 
+            tipo_productor(tipo) {}
 
     /* Si los hay, consume los recursos del inventario, espera 60ms y deposita
      * los puntos correspondientes */
-    void work() override;
+    void trabajar() override;
 
     /* Destructor */
     ~Productor();

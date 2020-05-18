@@ -10,14 +10,13 @@ public:
     /* Constructor */
     Thread();
 
-    /* Ejecuta el thread con el metodo abstracto work, que sera
+    /* Ejecuta el thread con el metodo abstracto trabajar, que sera
      * implementado por las clases hijas */
     void start();
     /* Bloquea el thread hasta que los otros completen su trabajo */
     void join();
 
-
-    virtual void work() = 0;
+    virtual void trabajar() = 0;
 
     /* Destructor */
     virtual ~Thread();

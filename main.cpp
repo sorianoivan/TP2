@@ -5,6 +5,7 @@ int main(int argc, char* argv[]) {
     if (argc == 3) {
        return tp.ejecutar(argv[1], argv[2]);
     } else {
-        return 1;
+        std::cerr << "Argumentos invalidos" << std::endl;
+        return ERROR;
     }
 }

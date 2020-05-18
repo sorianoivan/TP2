@@ -22,6 +22,8 @@ int TP::ejecutar(const std::string& mapa, const std::string& trabajadores) {
     return OK;
 }
 
+/* Crea "cant" de recolectores con su respectiva cola bloqueante
+     * y se guardan en "vector" */
 void TP::_crearRecolectores(const int cant, std::vector<Thread*>& vector,
                             ColaBloqueante& cola_recolector){
     for (int i = 0; i < cant; ++i) {
@@ -30,6 +32,7 @@ void TP::_crearRecolectores(const int cant, std::vector<Thread*>& vector,
     }
 }
 
+/* Crea "cant" de productores "tipo_productor" que se guardan en "vector" */
 void TP::_crearProductores(const int cant, std::vector<Thread*>& vector,
                            const int tipo){
     for (int i = 0; i < cant; ++i) {
@@ -38,6 +41,7 @@ void TP::_crearProductores(const int cant, std::vector<Thread*>& vector,
     }
 }
 
+/* Invoca recolectores y productores */
 void TP::_invocarTrabajadores() {
     file_processor.processTrabajadores();
 
@@ -54,24 +58,25 @@ void TP::_invocarTrabajadores() {
     _crearProductores(file_processor.getCantArmeros(), armeros, ARMERO);
 }
 
-/* Esta funcion se pasa de las 20 lineas unicamente por la estructura switch
- * por lo que no veo razon por la cual se deberia modularizar mas */
+/* Llena las colas bloqueantes con los recursos leidos del mapa.
+* Esta funcion se pasa de las 20 lineas unicamente por la estructura switch
+* por lo que no veo razon por la cual se deberia modularizar mas */
 void TP::_llenarColasDeRecursos() {
     char curr_recurso;
     while (!file_processor.recursosTerminados()){
         curr_recurso = file_processor.getRecurso();
         switch (curr_recurso) {
             case 'T':
-                cola_agricultores.push(Trigo);
+                cola_agricultores.depositar(Trigo);
                 break;
             case 'M':
-                cola_leniadores.push(Madera);
+                cola_leniadores.depositar(Madera);
                 break;
             case 'C':
-                cola_mineros.push(Carbon);
+                cola_mineros.depositar(Carbon);
                 break;
             case 'H':
-                cola_mineros.push(Hierro);
+                cola_mineros.depositar(Hierro);
                 break;
             default :
                 break;
@@ -82,6 +87,8 @@ void TP::_llenarColasDeRecursos() {
     cola_mineros.cerrar(); //ver de poner las colas en un vector
 }
 
+/* Finaliza el proceso de llenar el inventario y
+ * sumar los puntos de beneficio */
 void TP::_finalizar() {
     _liberarTrabajadores(file_processor.getCantAgricultores(), agricultores);
     _liberarTrabajadores(file_processor.getCantLeniadores(), leniadores);
@@ -94,6 +101,7 @@ void TP::_finalizar() {
     _liberarTrabajadores(file_processor.getCantArmeros(), armeros);
 }
 
+/* Libera los recursos pertenecientes a los recolectores y productores */
 void TP::_liberarTrabajadores(const int cant, std::vector<Thread*> vector) {
     for (int i = 0; i < cant; ++i) {
         vector[i]->join();
@@ -101,6 +109,7 @@ void TP::_liberarTrabajadores(const int cant, std::vector<Thread*> vector) {
     }
 }
 
+/* Muestra los resultados en el formato requerido */
 void TP::_mostrarResultados() const {
     std::cout << "Recursos restantes:" << std::endl;
     std::cout << "  - Trigo: " << inventario.getCantTrigo() << std::endl;

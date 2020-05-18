@@ -31,7 +31,7 @@ public:
     int abrirArchivos(const std::string& mapa_filename,
                       const std::string& trabajadores_filename);
     /* Procesa el archivo de trabajadores para obtener la cantidad
-     * de cada tipo de trabajador*/
+     * de cada tipo_productor de trabajador*/
     void processTrabajadores();
     /* Devuelve el recurso leido */
     char getRecurso();
@@ -50,7 +50,6 @@ public:
     int getCantCarpinteros() const;
     /* Devuelve la cantidad de armeros */
     int getCantArmeros() const;
-
 
     /* Destructor */
     ~FileProcessor();

@@ -20,7 +20,7 @@ public:
 
     /* Si hay, saca un recurso de la cola, espera 50ms y lo deposita
      * en el inventario */
-    void work() override;
+    void trabajar() override;
 
     /* Destructor */
     ~Recolector();

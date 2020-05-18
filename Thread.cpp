@@ -3,7 +3,7 @@
 Thread::Thread() {}
 
 void Thread::start() {
-    thread = std::thread(&Thread::work, this);
+    thread = std::thread(&Thread::trabajar, this);
 }
 
 void Thread::join() {

@@ -20,13 +20,13 @@ public:
     ColaBloqueante();
 
     /* Pone un recurso al final de la cola */
-    void push(Recurso recurso);
+    void depositar(const Recurso recurso);
     /* Quita el recurso del principio de la cola.
      * Si la cola esta vacia y fue cerrada devuelve
      * NoRecurso */
-    Recurso pop();
-    /* Retorna true si la cola no esta vacia y cerrada,
-     * false en caso contrario */
+    Recurso quitar();
+    /* Retorna false si la cola esta vacia y cerrada,
+     * true en otro caso */
     bool puedoQuitar();
     /* Cierra la cola y notifica a todos los threads que estan esperando */
     void cerrar();

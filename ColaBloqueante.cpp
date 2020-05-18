@@ -4,18 +4,18 @@ ColaBloqueante::ColaBloqueante() {
     this->cerrada = false;
 }
 
-void ColaBloqueante::push(Recurso recurso) {
+void ColaBloqueante::depositar(const Recurso recurso) {
     std::unique_lock<std::mutex> lock(mtx);
     queue.push(recurso);
     cond_var.notify_all();
 }
 
-Recurso ColaBloqueante::pop() {
+Recurso ColaBloqueante::quitar() {
     std::unique_lock<std::mutex> lock(mtx);
 
     while (queue.empty()){
         if (cerrada){
-            return NoRecurso;//Cuando un recolector hace pop y recibe
+            return NoRecurso;//Cuando un recolector hace quitar y recibe
                              //NoRecurso sabe que la cola termino
                              //de llenarse y termina de trabajar
         }
@@ -27,6 +27,7 @@ Recurso ColaBloqueante::pop() {
 }
 
 bool ColaBloqueante::puedoQuitar() {
+    std::unique_lock<std::mutex> lock(mtx);
     return !(queue.empty() && cerrada);
 }
 

@@ -20,7 +20,7 @@ Inventario::Inventario() {
     cerrado = false;
 }
 
-void Inventario::store(const Recurso recurso) {
+void Inventario::depositar(const Recurso recurso) {
     std::unique_lock<std::mutex> lock(mtx);
     switch (recurso) {
         case Trigo:
@@ -38,59 +38,21 @@ void Inventario::store(const Recurso recurso) {
         default:
             break;
     }
-    if (verificarRecursos()) cond_var.notify_all();
+    if (_verificarRecursos()) cond_var.notify_all();
 }
 
-int Inventario::_consumir(const int tipo) {//privada
-    switch (tipo) {
-        case COCINERO:
-            trigo -= RECETA_COCINERO_TRIGO;
-            carbon -= RECETA_COCINERO_CARBON;
-            return PUNTOS_COCINERO;
-
-        case CARPINTERO:
-            madera -= RECETA_CARPINTERO_MADERA;
-            hierro -= RECETA_CARPINTERO_HIERRO;
-            return PUNTOS_CARPINTERO;
-
-        case ARMERO:
-            hierro -= RECETA_ARMERO_HIERRO;
-            carbon -= RECETA_ARMERO_CARBON;
-            return PUNTOS_ARMERO;
-
-        default:
-            return 0;
-    }
-}
-
-int Inventario::consumirRecursos(const int tipo){
+unsigned int Inventario::consumirRecursos(const int tipo_productor){
     std::unique_lock<std::mutex> lock(mtx);
 
-    while (!verificarReceta(tipo)){
+    while (!verificarReceta(tipo_productor)){
         if (cerrado) return 0;
         cond_var.wait(lock);
     }
-    return _consumir(tipo);
+    return _consumir(tipo_productor);
 }
 
-
-bool Inventario::_verificarRecetaCocinero() const{//privada
-    return (trigo >= RECETA_COCINERO_TRIGO &&
-            carbon >= RECETA_COCINERO_CARBON);
-}
-
-bool Inventario::_verificarRecetaCarpintero() const{//privada
-    return (madera >= RECETA_CARPINTERO_MADERA &&
-            hierro >= RECETA_CARPINTERO_HIERRO);
-}
-
-bool Inventario::_verificarRecetaArmero() const{//privada
-    return (carbon >= RECETA_ARMERO_CARBON &&
-            hierro >= RECETA_ARMERO_HIERRO);
-}
-
-bool Inventario::verificarReceta(const int tipo) const {
-    switch (tipo) {
+bool Inventario::verificarReceta(const int tipo_productor) const {
+    switch (tipo_productor) {
         case COCINERO:
             return _verificarRecetaCocinero();
 
@@ -105,12 +67,8 @@ bool Inventario::verificarReceta(const int tipo) const {
     }
 }
 
-bool Inventario::verificarRecursos() const{
-    return (_verificarRecetaCocinero() || _verificarRecetaCarpintero()
-            || _verificarRecetaArmero());
-}
-
-bool Inventario::puedoConsumir() const{
+bool Inventario::puedoConsumir() {
+    std::unique_lock<std::mutex> lock(mtx);
     return !(cerrado);
 }
 
@@ -134,6 +92,55 @@ int Inventario::getCantHierro() const {
 
 int Inventario::getCantCarbon() const {
     return carbon;
+}
+
+/* Verifica si los recursos para el cocinero estan disponibles */
+bool Inventario::_verificarRecetaCocinero() const{
+    return (trigo >= RECETA_COCINERO_TRIGO &&
+            carbon >= RECETA_COCINERO_CARBON);
+}
+
+/* Verifica si los recursos para el carpintero estan disponibles */
+bool Inventario::_verificarRecetaCarpintero() const{
+    return (madera >= RECETA_CARPINTERO_MADERA &&
+            hierro >= RECETA_CARPINTERO_HIERRO);
+}
+
+/* Verifica si los recursos para el armero estan disponibles */
+bool Inventario::_verificarRecetaArmero() const{
+    return (carbon >= RECETA_ARMERO_CARBON &&
+            hierro >= RECETA_ARMERO_HIERRO);
+}
+
+/* Retorna true si hay recursos disponibles para que alguno de los
+     * productores consuma */
+bool Inventario::_verificarRecursos() const{
+    return (_verificarRecetaCocinero() || _verificarRecetaCarpintero()
+            || _verificarRecetaArmero());
+}
+
+/* Consume los recursos del productor "tipo_productor" y devuelve la cantidad
+     * de puntos correspondiente */
+unsigned int Inventario::_consumir(const int tipo) {
+    switch (tipo) {
+        case COCINERO:
+            trigo -= RECETA_COCINERO_TRIGO;
+            carbon -= RECETA_COCINERO_CARBON;
+            return PUNTOS_COCINERO;
+
+        case CARPINTERO:
+            madera -= RECETA_CARPINTERO_MADERA;
+            hierro -= RECETA_CARPINTERO_HIERRO;
+            return PUNTOS_CARPINTERO;
+
+        case ARMERO:
+            hierro -= RECETA_ARMERO_HIERRO;
+            carbon -= RECETA_ARMERO_CARBON;
+            return PUNTOS_ARMERO;
+
+        default:
+            return 0;
+    }
 }
 
 Inventario::~Inventario() {}

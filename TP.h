@@ -46,23 +46,14 @@ public:
     ~TP();
 
 private:
-    /* Invoca recolectores y productores */
     void _invocarTrabajadores();
-    /* Crea "cant" de recolectores con su respectiva cola bloqueante
-     * y se guardan en "vector" */
     void _crearRecolectores(const int cant, std::vector<Thread *>& vector,
                             ColaBloqueante& cola_recolector);
-    /* Crea "cant" de productores "tipo" que se guardan en "vector" */
     void _crearProductores(const int cant, std::vector<Thread *> &vector,
             const int tipo);
-    /* Llena las colas bloqueantes con los recursos leidos del mapa */
     void _llenarColasDeRecursos();
-    /* Muestra los resultados en el formato requerido */
     void _mostrarResultados() const;
-    /* Libera los recursos pertenecientes a los recolectores y productores */
     void _liberarTrabajadores(const int cant, std::vector<Thread *> vector);
-    /* Finaliza el proceso de llenar el inventario y
-     * sumar los puntos de beneficio */
     void _finalizar();
 };
 

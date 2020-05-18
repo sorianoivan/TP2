@@ -2,13 +2,13 @@
 
 #define TIEMPO_ESPERA_RECOLECTOR 50000
 
-void Recolector::work() {
+void Recolector::trabajar() {
     Recurso recurso;
     while (this->queue.puedoQuitar()) {
-        recurso = this->queue.pop();
+        recurso = this->queue.quitar();
         usleep(TIEMPO_ESPERA_RECOLECTOR);
         if (recurso != NoRecurso){
-            inventario.store(recurso);
+            inventario.depositar(recurso);
         }
     }
 }

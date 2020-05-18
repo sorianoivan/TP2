@@ -25,19 +25,16 @@ public:
     Inventario();
 
     /* Guarda un recurso en el inventario */
-    void store(Recurso recurso);
+    void depositar(const Recurso recurso);
     /* Cierra el inventario y notifica a todos los threads q estan esperando */
     void cerrar();
-    /* Retorna true si hay recursos disponibles para que alguno de los
-     * productores consuma */
-    bool verificarRecursos() const;
-    /* Verifica si alcanzan los recursos que el productor "tipo" necesita
+    /* Verifica si alcanzan los recursos que el productor "tipo_productor" necesita
      * para consumir */
-    bool verificarReceta(const int tipo) const;
+    bool verificarReceta(const int tipo_productor) const;
     /* Retorna true si el inventario no esta cerrado */
-    bool puedoConsumir() const;
+    bool puedoConsumir();
     /* Consume los recursos del inventario y devuelve los puntos a depositar */
-    int consumirRecursos(const int tipo);
+    unsigned int consumirRecursos(const int tipo_productor);
 
     /* Devuelve la cantidad de trigo */
     int getCantTrigo() const;
@@ -52,15 +49,11 @@ public:
     ~Inventario();
 
 private:
-    /* Verifica si los recursos para el cocinero estan disponibles */
+    bool _verificarRecursos() const;
     bool _verificarRecetaCocinero() const;
-    /* Verifica si los recursos para el carpintero estan disponibles */
     bool _verificarRecetaCarpintero() const;
-    /* Verifica si los recursos para el armero estan disponibles */
     bool _verificarRecetaArmero() const;
-    /* Consume los recursos del productor "tipo" y devuelve la cantidad
-     * de puntos correspondiente */
-    int _consumir(const int tipo);
+    unsigned int _consumir(const int tipo);
 };
 
 
